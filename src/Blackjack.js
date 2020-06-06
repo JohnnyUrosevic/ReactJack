@@ -1,12 +1,12 @@
 import React from 'react';
-import Card from './Card.js'
 import './Blackjack.css'
+import Player from './Player.js';
 
 function Blackjack() {
+  const sample_cards = [{suit: "S", value: "A"}, {suit: "C", value: "2"}, {suit: "H", value: "10"}];
   return (
     <div className="Table">
-      <Card suit="S" value="A"/>
-      <Card suit="C" value="3"/>
+      <Player cards={sample_cards}/>
     </div>
   );
 }
