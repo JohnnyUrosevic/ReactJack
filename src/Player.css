@@ -1,4 +1,9 @@
 p {
-    width: 5%;
+    margin: auto;
+    margin-bottom: 1em;
     text-align: center;
+}
+
+.cards {
+    width: 5%;
 }

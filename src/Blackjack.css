@@ -11,3 +11,18 @@ p {
   -moz-osx-font-smoothing: grayscale;
   font-weight: bold;
 }
+
+.players {
+    display: flex;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+    margin-top: 20%;
+}
+
+.dealer {
+    display: flex;
+    justify-content: center;
+    height: 20%;
+    margin-left: auto;
+}

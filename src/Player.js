@@ -32,10 +32,10 @@ const Player = (props) => {
     const card_to_html = (card, i) => <Card key={i} style={{marginTop: i * 2 + "%"}} suit={card.suit} value={card.value} />
     const card_html = props.cards.map(card_to_html);
     return (
-        <>
-            <p>{Math.max(...hand_values)}</p>
+        <div className="cards">
+            {props.cards.length > 0 && <p>{Math.max(...hand_values)}</p>}
             {card_html}
-        </>
+        </div>
     );
 }
 
