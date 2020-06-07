@@ -60,11 +60,41 @@ const Blackjack = () => {
 
   const [player_turn, set_player_turn] = useState(true);
 
+  const [status, set_status] = useState("Player's Turn");
+
+  const player_busted_ref = useRef(player_busted);
+  player_busted_ref.current = player_busted;
+
   const player_turn_ref = useRef(player_turn);
   player_turn_ref.current = player_turn;
 
+  const player_hand_ref = useRef(player_hand);
+  player_hand_ref.current = player_hand;
+
   const dealer_hand_ref = useRef(dealer_hand);
   dealer_hand_ref.current = dealer_hand;
+
+  const end_round = useCallback(() => {
+    const player_value = get_value(player_hand_ref.current);
+    const dealer_value = get_value(dealer_hand_ref.current);
+
+    if (player_busted_ref.current || (dealer_value > player_value && dealer_value <= 21)) {
+      set_status("House Wins");
+    }
+    else if (player_value === dealer_value) {
+      set_status("Tie Round");
+    }
+    else {
+      set_status("Player Wins");
+    }
+
+    setTimeout(() => {
+      set_player_hand([generate_card(), generate_card()]);
+      set_dealer_hand([generate_card()]);
+      set_player_turn(true);
+      set_status("Player's Turn")
+    }, 1000);
+  }, []);
 
   const run_dealer_turn = useCallback(() => {
     handle_hit(set_dealer_hand);
@@ -73,7 +103,7 @@ const Blackjack = () => {
     console.log(value);
 
     if (value >= 17 && !is_soft_17(dealer_hand_ref.current)) {
-      set_player_turn(false);
+      end_round();
       return;
     }
 
@@ -81,7 +111,7 @@ const Blackjack = () => {
   }, []);
 
   useEffect(() => {
-    const set_busted = (hand, set_busted) => {
+    const set_busted = (set_busted) => {
       if (get_value(player_hand) > 21) {
           set_busted(true);
       }
@@ -90,23 +120,26 @@ const Blackjack = () => {
       }
     }
 
-    set_busted(player_hand, set_player_busted);
+    set_busted(set_player_busted);
   }, [player_hand, run_dealer_turn]);
 
   useEffect(() => {
     if (player_busted) {
       set_player_turn(false);
+      end_round();
     }
   }, [player_busted]);
 
   useEffect(() => {
-    if (!player_turn) {
+    if (!player_turn && !player_busted) {
+      set_status("Dealer's turn");
       run_dealer_turn();
     }
   }, [player_turn]);
 
   return (
     <>
+      <h1>{status}</h1>
       <div className="dealer">
         <Player cards={dealer_hand}/>
       </div>
