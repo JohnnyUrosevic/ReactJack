@@ -14,8 +14,8 @@ const generate_card = () => {
 }
 
 const is_soft_17 = (hand) => {
-  return hand.length == 2 && ((hand[0].value == "A" && hand[1].value == "6")
-    || (hand[0].value == "6" && hand[1].value == "A"));
+  return hand.length === 2 && ((hand[0].value === "A" && hand[1].value === "6")
+    || (hand[0].value === "6" && hand[1].value === "A"));
 }
 
 export const get_value = (hand) => {
@@ -62,9 +62,6 @@ const Blackjack = () => {
 
   const [status, set_status] = useState("Player's Turn");
 
-  const player_busted_ref = useRef(player_busted);
-  player_busted_ref.current = player_busted;
-
   const player_turn_ref = useRef(player_turn);
   player_turn_ref.current = player_turn;
 
@@ -78,7 +75,7 @@ const Blackjack = () => {
     const player_value = get_value(player_hand_ref.current);
     const dealer_value = get_value(dealer_hand_ref.current);
 
-    if (player_busted_ref.current || (dealer_value > player_value && dealer_value <= 21)) {
+    if (player_busted || (dealer_value > player_value && dealer_value <= 21)) {
       set_status("House Wins");
     }
     else if (player_value === dealer_value) {
@@ -94,20 +91,18 @@ const Blackjack = () => {
       set_player_turn(true);
       set_status("Player's Turn")
     }, 1000);
-  }, []);
+  }, [player_busted]);
 
   const run_dealer_turn = useCallback(() => {
-    handle_hit(set_dealer_hand);
-    
     const value = get_value(dealer_hand_ref.current);
-    console.log(value);
-
     if (value >= 17 && !is_soft_17(dealer_hand_ref.current)) {
       end_round();
       return;
     }
 
-    setTimeout(run_dealer_turn, 100);
+    set_dealer_hand(hand => hand.concat(generate_card()));
+    
+    setTimeout(run_dealer_turn, 500);
   }, []);
 
   useEffect(() => {
