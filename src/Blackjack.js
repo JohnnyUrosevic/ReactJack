@@ -13,6 +13,11 @@ const generate_card = () => {
   return card;
 }
 
+const is_soft_17 = (hand) => {
+  return hand.length == 2 && ((hand[0].value == "A" && hand[1].value == "6")
+    || (hand[0].value == "6" && hand[1].value == "A"));
+}
+
 export const get_value = (hand) => {
   let hand_values = [0];
 
@@ -67,7 +72,7 @@ const Blackjack = () => {
     const value = get_value(dealer_hand_ref.current);
     console.log(value);
 
-    if (value >= 17) {
+    if (value >= 17 && !is_soft_17(dealer_hand_ref.current)) {
       set_player_turn(false);
       return;
     }
