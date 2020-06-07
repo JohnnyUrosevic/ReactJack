@@ -59,6 +59,11 @@ const Blackjack = () => {
   const [player_busted, set_player_busted] = useState(false);
 
   const [player_turn, set_player_turn] = useState(true);
+  const [betting, set_betting] = useState(true);
+
+  const [bet, set_bet] = useState(100);
+
+  const [balance, set_balance] = useState(1000);
 
   const [status, set_status] = useState("Player's Turn");
 
@@ -71,6 +76,9 @@ const Blackjack = () => {
   const dealer_hand_ref = useRef(dealer_hand);
   dealer_hand_ref.current = dealer_hand;
 
+  const bet_ref = useRef(bet);
+  bet_ref.current = bet;
+
   const end_round = useCallback(() => {
     const player_value = get_value(player_hand_ref.current);
     const dealer_value = get_value(dealer_hand_ref.current);
@@ -79,9 +87,11 @@ const Blackjack = () => {
       set_status("House Wins");
     }
     else if (player_value === dealer_value) {
+      set_balance(balance => balance + bet_ref.current)
       set_status("Tie Round");
     }
     else {
+      set_balance(balance => balance + bet_ref.current * 2)
       set_status("Player Wins");
     }
 
@@ -89,9 +99,10 @@ const Blackjack = () => {
       set_player_hand([generate_card(), generate_card()]);
       set_dealer_hand([generate_card()]);
       set_player_turn(true);
-      set_status("Player's Turn")
+      set_betting(true);
+      set_status("Player's Turn");
     }, 1000);
-  }, [player_busted]);
+  }, [player_busted, bet]);
 
   const run_dealer_turn = useCallback(() => {
     const value = get_value(dealer_hand_ref.current);
@@ -100,8 +111,8 @@ const Blackjack = () => {
       return;
     }
 
-    set_dealer_hand(hand => hand.concat(generate_card()));
-    
+    handle_hit(set_dealer_hand);
+
     setTimeout(run_dealer_turn, 500);
   }, []);
 
@@ -135,13 +146,20 @@ const Blackjack = () => {
   return (
     <>
       <h1>{status}</h1>
+      <p>Balance: {balance}</p>
       <div className="dealer">
         <Player cards={dealer_hand}/>
       </div>
       <div className="players">
         <Player cards={player_hand}/>
       </div>
-      {player_turn && <div className="buttons">
+      {betting && <div className="bet">
+        <strong>Place a bet:</strong>
+        <input value={bet} onChange={(e) => set_bet(e.target.value)}></input>
+        <button onClick={() => {set_betting(false); set_balance(balance => balance - bet)}}>Submit</button>
+      </div>
+      }
+      {player_turn && !betting && <div className="buttons">
           <button onClick={() => handle_hit(set_player_hand)}>Hit</button>
           <button onClick={() => set_player_turn(false)}>Stand</button>
       </div>}
