@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './Blackjack.css'
 import Player from './Player.js';
 
@@ -36,21 +36,44 @@ export const get_value = (hand) => {
 
   const non_busted = hand_values.filter((v) => v < 22);
 
-  if (!(non_busted.length == 0)) {
+  if (!(non_busted.length === 0)) {
       hand_values = non_busted;
   }
 
   return Math.max(...hand_values);
 }
 
+const handle_hit = (set_hand) => {
+  set_hand(hand => hand.concat(generate_card()));
+}
+
 const Blackjack = () => {
-  const [player_hand, set_player_hand] = useState([generate_card()])
-  const [dealer_hand, set_dealer_hand] = useState([generate_card()])
+  const [player_hand, set_player_hand] = useState([generate_card(), generate_card()]);
+  const [dealer_hand, set_dealer_hand] = useState([generate_card()]);
  
   const [player_busted, set_player_busted] = useState(false);
-  const [dealer_busted, set_dealer_busted] = useState(false);
 
   const [player_turn, set_player_turn] = useState(true);
+
+  const player_turn_ref = useRef(player_turn);
+  player_turn_ref.current = player_turn;
+
+  const dealer_hand_ref = useRef(dealer_hand);
+  dealer_hand_ref.current = dealer_hand;
+
+  const run_dealer_turn = useCallback(() => {
+    handle_hit(set_dealer_hand);
+    
+    const value = get_value(dealer_hand_ref.current);
+    console.log(value);
+
+    if (value >= 17) {
+      set_player_turn(false);
+      return;
+    }
+
+    setTimeout(run_dealer_turn, 100);
+  }, []);
 
   useEffect(() => {
     const set_busted = (hand, set_busted) => {
@@ -63,12 +86,19 @@ const Blackjack = () => {
     }
 
     set_busted(player_hand, set_player_busted);
-    set_busted(dealer_hand, set_dealer_busted);
-  }, [player_hand]);
+  }, [player_hand, run_dealer_turn]);
 
-  const handle_hit = (hand, set_hand) => {
-    set_hand(hand.concat(generate_card()));
-  }
+  useEffect(() => {
+    if (player_busted) {
+      set_player_turn(false);
+    }
+  }, [player_busted]);
+
+  useEffect(() => {
+    if (!player_turn) {
+      run_dealer_turn();
+    }
+  }, [player_turn]);
 
   return (
     <>
@@ -78,9 +108,9 @@ const Blackjack = () => {
       <div className="players">
         <Player cards={player_hand}/>
       </div>
-      {!player_busted && <div className="buttons">
-          <button onClick={() => handle_hit(player_hand, set_player_hand)}>Hit</button>
-          <button>Stand</button>
+      {player_turn && <div className="buttons">
+          <button onClick={() => handle_hit(set_player_hand)}>Hit</button>
+          <button onClick={() => set_player_turn(false)}>Stand</button>
       </div>}
     </>
   );
