@@ -79,6 +79,20 @@ const Blackjack = () => {
   const bet_ref = useRef(bet);
   bet_ref.current = bet;
 
+  const handle_change = (e) => {
+    const value = Number(e.target.value);
+
+    if (isNaN(value)) {
+      set_bet(bet => bet);
+    }
+    else if (value > balance) {
+      set_bet(balance);
+    }
+    else {
+      set_bet(value);
+    }
+  }
+
   const end_round = useCallback(() => {
     const player_value = get_value(player_hand_ref.current);
     const dealer_value = get_value(dealer_hand_ref.current);
@@ -155,7 +169,7 @@ const Blackjack = () => {
       </div>
       {betting && <div className="bet">
         <strong>Place a bet:</strong>
-        <input value={bet} onChange={(e) => set_bet(e.target.value)}></input>
+        <input value={bet} onChange={handle_change}></input>
         <button onClick={() => {set_betting(false); set_balance(balance => balance - bet)}}>Submit</button>
       </div>
       }
