@@ -117,7 +117,12 @@ const Blackjack = () => {
       set_dealer_hand([generate_card()]);
       set_player_turn(true);
       set_betting(true);
-      set_status("Player's Turn");
+      if (balance === 0) {
+        set_status("Game Over")
+      }
+      else {
+        set_status("Player's Turn");
+      }
     }, 1000);
   }, [player_busted, bet]);
 
@@ -170,7 +175,7 @@ const Blackjack = () => {
       <div className="players">
         <Player cards={player_hand} hidden={betting}/>
       </div>
-      {betting && <div className="bet">
+      {betting && balance > 0 && <div className="bet">
         <strong>Place a bet:</strong>
         <input value={bet} onChange={handle_change}></input>
         <button onClick={() => {set_betting(false); set_balance(balance => balance - bet)}}>Submit</button>
