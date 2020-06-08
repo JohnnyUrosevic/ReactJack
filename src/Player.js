@@ -4,7 +4,8 @@ import './Player.css'
 import { get_value } from './Blackjack.js';
 
 const Player = (props) => {
-    const card_to_html = (card, i) => <Card key={i} style={{marginTop: i * 2 + "%"}} suit={card.suit} value={card.value} />
+    const card_to_html = (card, i) => <Card key={i} style={{marginTop: i * 2 + "%"}} suit={card.suit}
+        value={card.value} hidden={props.hidden} />
     const card_html = props.cards.map(card_to_html);
 
     const text_color = (get_value(props.cards) < 22) ? "white" : "red";

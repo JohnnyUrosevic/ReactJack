@@ -88,6 +88,9 @@ const Blackjack = () => {
     else if (value > balance) {
       set_bet(balance);
     }
+    else if (value <= 0) {
+      set_bet(1);
+    }
     else {
       set_bet(value);
     }
@@ -162,10 +165,10 @@ const Blackjack = () => {
       <h1>{status}</h1>
       <p>Balance: {balance}</p>
       <div className="dealer">
-        <Player cards={dealer_hand}/>
+        <Player cards={dealer_hand} hidden={betting}/>
       </div>
       <div className="players">
-        <Player cards={player_hand}/>
+        <Player cards={player_hand} hidden={betting}/>
       </div>
       {betting && <div className="bet">
         <strong>Place a bet:</strong>
